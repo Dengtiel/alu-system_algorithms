@@ -2,6 +2,13 @@
 #include <string.h>
 #include "graphs.h"
 
+/**
+ * find_vertex - Finds a vertex in the graph by its string content
+ * @graph: Pointer to the graph
+ * @str: The string to search for
+ *
+ * Return: Pointer to the vertex, or NULL if not found
+ */
 static vertex_t *find_vertex(graph_t *graph, const char *str)
 {
 	vertex_t *tmp;
@@ -16,6 +23,13 @@ static vertex_t *find_vertex(graph_t *graph, const char *str)
 	return (NULL);
 }
 
+/**
+ * create_edge - Creates and appends an edge from src to dest
+ * @src: Pointer to the source vertex
+ * @dest: Pointer to the destination vertex
+ *
+ * Return: 1 on success, 0 on failure
+ */
 static int create_edge(vertex_t *src, vertex_t *dest)
 {
 	edge_t *new_edge;
@@ -39,6 +53,12 @@ static int create_edge(vertex_t *src, vertex_t *dest)
 	return (1);
 }
 
+/**
+ * remove_last_edge - Removes the last edge from a vertex
+ * @src: Pointer to the source vertex
+ *
+ * Return: void
+ */
 static void remove_last_edge(vertex_t *src)
 {
 	edge_t *e;
