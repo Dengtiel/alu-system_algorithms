@@ -65,6 +65,19 @@ typedef struct graph_s
 	vertex_t  *vertices;
 } graph_t;
 
+/**
+ * struct queue_node_s - Node in a queue for BFS
+ * @v: Pointer to the vertex
+ * @depth: Depth of the vertex
+ * @next: Pointer to the next node
+ */
+typedef struct queue_node_s
+{
+	const vertex_t      *v;
+	size_t               depth;
+	struct queue_node_s *next;
+} queue_node_t;
+
 /* Function prototypes */
 graph_t  *graph_create(void);
 vertex_t *graph_add_vertex(graph_t *graph, const char *str);
