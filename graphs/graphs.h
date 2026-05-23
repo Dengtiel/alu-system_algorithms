@@ -68,5 +68,6 @@ typedef struct graph_s
 /* Function prototypes */
 graph_t  *graph_create(void);
 vertex_t *graph_add_vertex(graph_t *graph, const char *str);
+int       graph_add_edge(graph_t *graph, const char *src, const char *dest, edge_type_t type);
 
 #endif /* GRAPHS_H */
