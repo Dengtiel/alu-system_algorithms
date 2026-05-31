@@ -2,7 +2,7 @@
 #include "heap.h"
 
 /**
- * get_last_node - Gets the last node in the heap (rightmost of last level)
+ * get_last_node - Gets the last node in level-order
  *
  * @root: Root of the heap
  * @size: Current size of the heap
@@ -12,28 +12,28 @@
 static binary_tree_node_t *get_last_node(binary_tree_node_t *root,
 	size_t size)
 {
-	size_t index;
 	size_t mask;
 
-	index = size;
 	mask = 1;
-	while (mask <= index / 2)
+	while (mask <= size / 2)
 		mask <<= 1;
 	mask >>= 1;
 
 	while (mask > 1)
 	{
-		if (index & mask)
+		if (size & mask)
 			root = root->right;
 		else
 			root = root->left;
 		mask >>= 1;
 	}
-	return (root);
+	if (size & 1)
+		return (root->right ? root->right : root->left);
+	return (root->left);
 }
 
 /**
- * heapify_down - Restores min-heap property by pushing node down
+ * heapify_down - Restores min-heap by pushing node down
  *
  * @node: Node to push down
  * @heap: Pointer to the heap
@@ -65,7 +65,7 @@ static void heapify_down(binary_tree_node_t *node, heap_t *heap)
  *
  * @heap: Pointer to the heap
  *
- * Return: Pointer to the data stored in the root node, or NULL if fails
+ * Return: Pointer to the data stored in root node, or NULL if fails
  */
 void *heap_extract(heap_t *heap)
 {
@@ -77,7 +77,6 @@ void *heap_extract(heap_t *heap)
 
 	data = heap->root->data;
 
-	/* If only one node, just remove it */
 	if (heap->size == 1)
 	{
 		free(heap->root);
@@ -86,11 +85,10 @@ void *heap_extract(heap_t *heap)
 		return (data);
 	}
 
-	/* Get last node and move its data to root */
 	last = get_last_node(heap->root, heap->size);
+
 	heap->root->data = last->data;
 
-	/* Remove last node from tree */
 	if (last->parent->right == last)
 		last->parent->right = NULL;
 	else
@@ -99,7 +97,6 @@ void *heap_extract(heap_t *heap)
 	free(last);
 	heap->size--;
 
-	/* Restore heap property */
 	heapify_down(heap->root, heap);
 
 	return (data);
