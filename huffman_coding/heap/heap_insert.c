@@ -15,16 +15,12 @@ static binary_tree_node_t *get_insert_parent(binary_tree_node_t *root,
 	size_t index;
 	size_t mask;
 
-	/* new node index is size + 1, find path from root */
 	index = size + 1;
-
-	/* find the highest bit below the leading 1 */
 	mask = 1;
 	while (mask <= index / 2)
 		mask <<= 1;
 	mask >>= 1;
 
-	/* skip the leading bit, traverse until second-to-last bit */
 	while (mask > 1)
 	{
 		if (index & mask)
