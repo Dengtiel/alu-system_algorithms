@@ -2,73 +2,61 @@
 #include "heap.h"
 
 /**
- * get_insert_parent - Finds the parent node where new node should be inserted
+ * get_insert_parent - Finds parent node for next insertion spot
  *
  * @root: Root of the heap
- * @size: Current size of the heap
+ * @size: Current size of heap
  *
- * Return: Pointer to the parent node
+ * Return: Pointer to parent node
  */
 static binary_tree_node_t *get_insert_parent(binary_tree_node_t *root,
 	size_t size)
 {
-	size_t path;
-	int bits;
+	size_t index;
+	size_t path[64];
+	int depth;
+	int i;
 
-	/* Find path from root to insertion point using binary representation */
-	size = size + 1;
-	bits = 0;
-	path = size;
-	while (path > 1)
+	index = size + 1;
+	depth = 0;
+	while (index > 1)
 	{
-		path >>= 1;
-		bits++;
+		path[depth++] = index % 2;
+		index /= 2;
 	}
 
-	/* Traverse from root following the bits (excluding the leading 1) */
-	path = size;
-	bits--;
-	while (bits > 1)
+	for (i = depth - 1; i > 0; i--)
 	{
-		if (path & (1 << bits))
-			root = root->right;
-		else
+		if (path[i - 1] == 0)
 			root = root->left;
-		bits--;
+		else
+			root = root->right;
 	}
 	return (root);
 }
 
 /**
- * swap_data - Swaps the data between two nodes
+ * heapify_up - Bubbles node up to restore min-heap property
  *
- * @a: First node
- * @b: Second node
+ * @node: Newly inserted node
+ * @heap: Pointer to the heap
+ *
+ * Return: Pointer to the node containing the inserted data
  */
-static void swap_data(binary_tree_node_t *a, binary_tree_node_t *b)
+static binary_tree_node_t *heapify_up(binary_tree_node_t *node,
+	heap_t *heap)
 {
 	void *tmp;
 
-	tmp = a->data;
-	a->data = b->data;
-	b->data = tmp;
-}
-
-/**
- * heapify_up - Restores min-heap property by bubbling node up
- *
- * @node: Newly inserted node
- * @data_cmp: Comparison function
- */
-static void heapify_up(binary_tree_node_t *node,
-	int (*data_cmp)(void *, void *))
-{
 	while (node->parent != NULL &&
-		data_cmp(node->data, node->parent->data) < 0)
+		heap->data_cmp(node->data, node->parent->data) < 0)
 	{
-		swap_data(node, node->parent);
+		tmp = node->data;
+		node->data = node->parent->data;
+		node->parent->data = tmp;
 		node = node->parent;
 	}
+	return (node);
 }
 
 /**
@@ -91,7 +79,6 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 	if (node == NULL)
 		return (NULL);
 
-	/* If heap is empty, new node becomes root */
 	if (heap->root == NULL)
 	{
 		heap->root = node;
@@ -99,10 +86,8 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 		return (node);
 	}
 
-	/* Find the parent of the insertion point */
 	parent = get_insert_parent(heap->root, heap->size);
 
-	/* Attach new node to parent */
 	node->parent = parent;
 	if (parent->left == NULL)
 		parent->left = node;
@@ -110,9 +95,7 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 		parent->right = node;
 
 	heap->size++;
-
-	/* Restore min-heap property */
-	heapify_up(node, heap->data_cmp);
+	heapify_up(node, heap);
 
 	return (node);
 }
