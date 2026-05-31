@@ -13,24 +13,25 @@ static binary_tree_node_t *get_insert_parent(binary_tree_node_t *root,
 	size_t size)
 {
 	size_t index;
-	size_t path[64];
-	int depth;
-	int i;
+	size_t mask;
 
+	/* new node index is size + 1, find path from root */
 	index = size + 1;
-	depth = 0;
-	while (index > 1)
-	{
-		path[depth++] = index % 2;
-		index /= 2;
-	}
 
-	for (i = depth - 1; i > 0; i--)
+	/* find the highest bit below the leading 1 */
+	mask = 1;
+	while (mask <= index / 2)
+		mask <<= 1;
+	mask >>= 1;
+
+	/* skip the leading bit, traverse until second-to-last bit */
+	while (mask > 1)
 	{
-		if (path[i - 1] == 0)
-			root = root->left;
-		else
+		if (index & mask)
 			root = root->right;
+		else
+			root = root->left;
+		mask >>= 1;
 	}
 	return (root);
 }
@@ -40,11 +41,8 @@ static binary_tree_node_t *get_insert_parent(binary_tree_node_t *root,
  *
  * @node: Newly inserted node
  * @heap: Pointer to the heap
- *
- * Return: Pointer to the node containing the inserted data
  */
-static binary_tree_node_t *heapify_up(binary_tree_node_t *node,
-	heap_t *heap)
+static void heapify_up(binary_tree_node_t *node, heap_t *heap)
 {
 	void *tmp;
 
@@ -56,7 +54,6 @@ static binary_tree_node_t *heapify_up(binary_tree_node_t *node,
 		node->parent->data = tmp;
 		node = node->parent;
 	}
-	return (node);
 }
 
 /**
