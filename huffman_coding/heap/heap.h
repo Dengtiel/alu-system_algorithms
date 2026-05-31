@@ -42,7 +42,4 @@ binary_tree_node_t *binary_tree_node(binary_tree_node_t *parent, void *data);
 /* heap_insert.c */
 binary_tree_node_t *heap_insert(heap_t *heap, void *data);
 
-/* heap_delete.c */
-void _heap_delete(heap_t *heap, void (*free_data)(void *));
-
 #endif /* HEAP_H */
