@@ -19,4 +19,7 @@ typedef struct symbol_s
 /* symbol.c */
 symbol_t *symbol_create(char data, size_t freq);
 
+/* huffman_priority_queue.c */
+heap_t *huffman_priority_queue(char *data, size_t *freq, size_t size);
+
 #endif /* HUFFMAN_H */
