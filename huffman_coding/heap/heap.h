@@ -39,4 +39,7 @@ heap_t *heap_create(int (*data_cmp)(void *, void *));
 /* binary_tree_node.c */
 binary_tree_node_t *binary_tree_node(binary_tree_node_t *parent, void *data);
 
+/* heap_insert.c */
+binary_tree_node_t *heap_insert(heap_t *heap, void *data);
+
 #endif /* HEAP_H */
