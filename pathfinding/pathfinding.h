@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "queues.h"
+#include "graphs.h"
 
 /**
  * struct point_s - Structure storing coordinates
@@ -19,5 +20,9 @@ typedef struct point_s
 /* 0-backtracking_array.c */
 queue_t *backtracking_array(char **map, int rows, int cols,
 	point_t const *start, point_t const *target);
+
+/* 1-backtracking_graph.c */
+queue_t *backtracking_graph(graph_t *graph, vertex_t const *start,
+	vertex_t const *target);
 
 #endif /* PATHFINDING_H */
