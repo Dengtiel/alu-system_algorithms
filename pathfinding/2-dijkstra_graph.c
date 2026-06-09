@@ -153,6 +153,16 @@ static int alloc_init(size_t n, size_t **dist, size_t **prev,
 	(*dist)[start_idx] = 0;
 	return (1);
 }
+/**
+ * dijkstra_graph - Finds shortest path using Dijkstra algorithm
+ *
+ * @graph: Pointer to the graph
+ * @start: Starting vertex
+ * @target: Target vertex
+ *
+ * Return: Queue containing shortest path, or NULL if no path found
+ */
+
 queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 	vertex_t const *target)
 {
