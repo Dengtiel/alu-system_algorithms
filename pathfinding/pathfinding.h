@@ -25,4 +25,8 @@ queue_t *backtracking_array(char **map, int rows, int cols,
 queue_t *backtracking_graph(graph_t *graph, vertex_t const *start,
 	vertex_t const *target);
 
+/* 2-dijkstra_graph.c */
+queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
+	vertex_t const *target);
+
 #endif /* PATHFINDING_H */
