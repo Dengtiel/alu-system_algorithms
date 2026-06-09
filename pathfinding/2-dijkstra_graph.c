@@ -36,6 +36,25 @@ static vertex_t *get_min_vertex(graph_t *graph, size_t *dist,
 }
 
 /**
+ * get_vertex_by_index - Gets vertex at given index
+ *
+ * @graph: Pointer to the graph
+ * @idx: Index to find
+ *
+ * Return: Pointer to the vertex, or NULL
+ */
+static vertex_t *get_vertex_by_index(graph_t *graph, size_t idx)
+{
+	vertex_t *v;
+	size_t i;
+
+	v = graph->vertices;
+	for (i = 0; v && i < idx; i++)
+		v = v->next;
+	return (v);
+}
+
+/**
  * build_path - Builds the path queue from predecessor array
  *
  * @graph: Pointer to the graph
@@ -51,20 +70,17 @@ static queue_t *build_path(graph_t *graph, size_t *prev,
 	queue_t *path;
 	vertex_t *v;
 	char *city;
-	size_t idx, count, i;
-	size_t *stack;
+	size_t *stack, count, idx, i;
 
 	path = queue_create();
 	if (!path)
 		return (NULL);
-
 	stack = malloc(sizeof(size_t) * n);
 	if (!stack)
 	{
 		queue_delete(path);
 		return (NULL);
 	}
-
 	count = 0;
 	idx = target_idx;
 	while (idx != INF)
@@ -72,16 +88,9 @@ static queue_t *build_path(graph_t *graph, size_t *prev,
 		stack[count++] = idx;
 		idx = prev[idx];
 	}
-
 	for (i = count; i > 0; i--)
 	{
-		v = graph->vertices;
-		idx = 0;
-		while (v && idx < stack[i - 1])
-		{
-			v = v->next;
-			idx++;
-		}
+		v = get_vertex_by_index(graph, stack[i - 1]);
 		if (!v)
 			break;
 		city = strdup(v->content);
@@ -93,9 +102,33 @@ static queue_t *build_path(graph_t *graph, size_t *prev,
 		}
 		queue_push_back(path, city);
 	}
-
 	free(stack);
 	return (path);
+}
+
+/**
+ * relax_edges - Relaxes edges from current vertex
+ *
+ * @u: Current vertex
+ * @dist: Distance array
+ * @prev: Predecessor array
+ * @visited: Visited array
+ */
+static void relax_edges(vertex_t *u, size_t *dist,
+	size_t *prev, int *visited)
+{
+	edge_t *e;
+	size_t i;
+
+	for (e = u->edges; e; e = e->next)
+	{
+		i = e->dest->index;
+		if (!visited[i] && dist[u->index] + e->weight < dist[i])
+		{
+			dist[i] = dist[u->index] + e->weight;
+			prev[i] = u->index;
+		}
+	}
 }
 
 /**
@@ -112,8 +145,7 @@ queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 {
 	size_t *dist, *prev, n, i, u_idx;
 	int *visited;
-	vertex_t *u, *v;
-	edge_t *e;
+	vertex_t *u;
 	queue_t *path;
 
 	if (!graph || !start || !target)
@@ -124,7 +156,9 @@ queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 	visited = malloc(sizeof(int) * n);
 	if (!dist || !prev || !visited)
 	{
-		free(dist); free(prev); free(visited);
+		free(dist);
+		free(prev);
+		free(visited);
 		return (NULL);
 	}
 	for (i = 0; i < n; i++)
@@ -144,19 +178,7 @@ queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 			u->content, start->content, dist[u_idx]);
 		if (u_idx == target->index)
 			break;
-		e = u->edges;
-		while (e)
-		{
-			v = e->dest;
-			i = v->index;
-			if (!visited[i] && dist[u_idx] != INF &&
-				dist[u_idx] + e->weight < dist[i])
-			{
-				dist[i] = dist[u_idx] + e->weight;
-				prev[i] = u_idx;
-			}
-			e = e->next;
-		}
+		relax_edges(u, dist, prev, visited);
 	}
 	path = NULL;
 	if (dist[target->index] != INF)
