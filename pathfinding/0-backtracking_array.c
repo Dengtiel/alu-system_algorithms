@@ -25,10 +25,8 @@ static int backtrack(char **map, int **visited, int rows, int cols,
 		return (0);
 	if (map[y][x] == '1' || visited[y][x])
 		return (0);
-
 	printf("Checking coordinates [%d, %d]\n", x, y);
 	visited[y][x] = 1;
-
 	if (x == target->x && y == target->y)
 	{
 		point = malloc(sizeof(point_t));
@@ -39,7 +37,6 @@ static int backtrack(char **map, int **visited, int rows, int cols,
 		queue_push_front(path, point);
 		return (1);
 	}
-
 	if (backtrack(map, visited, rows, cols, x + 1, y, target, path) ||
 		backtrack(map, visited, rows, cols, x, y + 1, target, path) ||
 		backtrack(map, visited, rows, cols, x - 1, y, target, path) ||
@@ -53,25 +50,19 @@ static int backtrack(char **map, int **visited, int rows, int cols,
 		queue_push_front(path, point);
 		return (1);
 	}
-
 	return (0);
 }
 
 /**
- * backtracking_array - Searches for first path in a 2D array
+ * init_visited - Allocates and initializes visited array
  *
- * @map: Read-only 2D array (0=walkable, 1=blocked)
  * @rows: Number of rows
  * @cols: Number of columns
- * @start: Starting point
- * @target: Target point
  *
- * Return: Queue containing path points, or NULL if no path found
+ * Return: Pointer to visited array, or NULL on failure
  */
-queue_t *backtracking_array(char **map, int rows, int cols,
-	point_t const *start, point_t const *target)
+static int **init_visited(int rows, int cols)
 {
-	queue_t *path;
 	int **visited;
 	int i, j;
 
@@ -91,7 +82,30 @@ queue_t *backtracking_array(char **map, int rows, int cols,
 		for (j = 0; j < cols; j++)
 			visited[i][j] = 0;
 	}
+	return (visited);
+}
 
+/**
+ * backtracking_array - Searches for first path in a 2D array
+ *
+ * @map: Read-only 2D array (0=walkable, 1=blocked)
+ * @rows: Number of rows
+ * @cols: Number of columns
+ * @start: Starting point
+ * @target: Target point
+ *
+ * Return: Queue containing path points, or NULL if no path found
+ */
+queue_t *backtracking_array(char **map, int rows, int cols,
+	point_t const *start, point_t const *target)
+{
+	queue_t *path;
+	int **visited;
+	int i;
+
+	visited = init_visited(rows, cols);
+	if (!visited)
+		return (NULL);
 	path = queue_create();
 	if (!path)
 	{
@@ -100,17 +114,14 @@ queue_t *backtracking_array(char **map, int rows, int cols,
 		free(visited);
 		return (NULL);
 	}
-
 	if (!backtrack(map, visited, rows, cols,
 		start->x, start->y, target, path))
 	{
 		queue_delete(path);
 		path = NULL;
 	}
-
 	for (i = 0; i < rows; i++)
 		free(visited[i]);
 	free(visited);
-
 	return (path);
 }
