@@ -142,7 +142,7 @@ static void relax_edges(vertex_t *u, size_t *dist,
 queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 	vertex_t const *target)
 {
-	size_t *dist, *prev, n, i, u_idx;
+	size_t *dist, *prev, n, u_idx;
 	int *visited;
 	vertex_t *u;
 	queue_t *path;
@@ -160,13 +160,10 @@ queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 		free(visited);
 		return (NULL);
 	}
-	for (i = 0; i < n; i++)
-	{
-		dist[i] = INF;
-		prev[i] = INF;
-		visited[i] = 0;
-	}
-	dist[start->index] = 0;
+	memset(dist, -1, sizeof(size_t) * n);
+	memset(prev, -1, sizeof(size_t) * n);
+        dist[start->index] = 0;
+	memset(visited, 0, sizeof(int) * n);
 	while ((u = get_min_vertex(graph, dist, visited, n)) != NULL)
 	{
 		u_idx = u->index;
