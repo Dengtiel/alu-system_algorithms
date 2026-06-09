@@ -35,24 +35,6 @@ static vertex_t *get_min_vertex(graph_t *graph, size_t *dist,
 	return (min_v);
 }
 
-/**
- * get_vertex_by_index - Gets vertex at given index
- *
- * @graph: Pointer to the graph
- * @idx: Index to find
- *
- * Return: Pointer to the vertex, or NULL
- */
-static vertex_t *get_vertex_by_index(graph_t *graph, size_t idx)
-{
-	vertex_t *v;
-	size_t i;
-
-	v = graph->vertices;
-	for (i = 0; v && i < idx; i++)
-		v = v->next;
-	return (v);
-}
 
 /**
  * build_path - Builds the path queue from predecessor array
@@ -70,7 +52,7 @@ static queue_t *build_path(graph_t *graph, size_t *prev,
 	queue_t *path;
 	vertex_t *v;
 	char *city;
-	size_t *stack, count, idx, i;
+	size_t *stack, count, idx, i, j;
 
 	path = queue_create();
 	if (!path)
@@ -90,7 +72,9 @@ static queue_t *build_path(graph_t *graph, size_t *prev,
 	}
 	for (i = count; i > 0; i--)
 	{
-		v = get_vertex_by_index(graph, stack[i - 1]);
+		v = graph->vertices;
+		for (j = 0; v && j < stack[i - 1]; j++)
+			v = v->next;
 		if (!v)
 			break;
 		city = strdup(v->content);
@@ -139,6 +123,36 @@ static void relax_edges(vertex_t *u, size_t *dist,
  *
  * Return: Queue containing shortest path, or NULL if no path found
  */
+/**
+ * alloc_init - Allocates and initializes arrays for Dijkstra
+ *
+ * @n: Number of vertices
+ * @dist: Distance array
+ * @prev: Predecessor array
+ * @visited: Visited array
+ * @start_idx: Start vertex index
+ *
+ * Return: 1 on success, 0 on failure
+ */
+static int alloc_init(size_t n, size_t **dist, size_t **prev,
+	int **visited, size_t start_idx)
+{
+	*dist = malloc(sizeof(size_t) * n);
+	*prev = malloc(sizeof(size_t) * n);
+	*visited = malloc(sizeof(int) * n);
+	if (!*dist || !*prev || !*visited)
+	{
+		free(*dist);
+		free(*prev);
+		free(*visited);
+		return (0);
+	}
+	memset(*dist, -1, sizeof(size_t) * n);
+	memset(*prev, -1, sizeof(size_t) * n);
+	memset(*visited, 0, sizeof(int) * n);
+	(*dist)[start_idx] = 0;
+	return (1);
+}
 queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 	vertex_t const *target)
 {
@@ -150,19 +164,7 @@ queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 	if (!graph || !start || !target)
 		return (NULL);
 	n = graph->nb_vertices;
-	dist = malloc(sizeof(size_t) * n);
-	prev = malloc(sizeof(size_t) * n);
-	visited = malloc(sizeof(int) * n);
-	if (!dist || !prev || !visited)
-	{
-		free(dist);
-		free(prev);
-		free(visited);
-		return (NULL);
-	}
-	memset(dist, -1, sizeof(size_t) * n);
-	memset(prev, -1, sizeof(size_t) * n);
-        dist[start->index] = 0;
+	if (!alloc_init(n, &dist, &prev, &visited, start->index))
 	memset(visited, 0, sizeof(int) * n);
 	while ((u = get_min_vertex(graph, dist, visited, n)) != NULL)
 	{
