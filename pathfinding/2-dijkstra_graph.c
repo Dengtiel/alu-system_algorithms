@@ -115,15 +115,6 @@ static void relax_edges(vertex_t *u, size_t *dist,
 	}
 }
 /**
- * dijkstra_graph - Finds shortest path using Dijkstra's algorithm
- *
- * @graph: Pointer to the graph
- * @start: Starting vertex
- * @target: Target vertex
- *
- * Return: Queue containing shortest path, or NULL if no path found
- */
-/**
  * alloc_init - Allocates and initializes arrays for Dijkstra
  *
  * @n: Number of vertices
