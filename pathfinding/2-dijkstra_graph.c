@@ -132,6 +132,32 @@ static void relax_edges(vertex_t *u, size_t *dist,
 }
 
 /**
+ * alloc_arrays - Allocates dist, prev and visited arrays
+ *
+ * @n: Number of vertices
+ * @dist: Distance array pointer
+ * @prev: Predecessor array pointer
+ * @visited: Visited array pointer
+ *
+ * Return: 1 on success, 0 on failure
+ */
+static int alloc_arrays(size_t n, size_t **dist,
+	size_t **prev, int **visited)
+{
+	*dist = malloc(sizeof(size_t) * n);
+	*prev = malloc(sizeof(size_t) * n);
+	*visited = malloc(sizeof(int) * n);
+	if (!*dist || !*prev || !*visited)
+	{
+		free(*dist);
+		free(*prev);
+		free(*visited);
+		return (0);
+	}
+	return (1);
+}
+
+/**
  * dijkstra_graph - Finds shortest path using Dijkstra's algorithm
  *
  * @graph: Pointer to the graph
@@ -151,16 +177,8 @@ queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 	if (!graph || !start || !target)
 		return (NULL);
 	n = graph->nb_vertices;
-	dist = malloc(sizeof(size_t) * n);
-	prev = malloc(sizeof(size_t) * n);
-	visited = malloc(sizeof(int) * n);
-	if (!dist || !prev || !visited)
-	{
-		free(dist);
-		free(prev);
-		free(visited);
+	if (!alloc_arrays(n, &dist, &prev, &visited))
 		return (NULL);
-	}
 	for (i = 0; i < n; i++)
 	{
 		dist[i] = INF;
